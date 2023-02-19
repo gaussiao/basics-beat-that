@@ -20,9 +20,13 @@ var rollDiceStr = (noOfDice) => {
     diceRollsArr.push(currRoll);
     msg += `You rolled ${currRoll} for dice ${count + 1}.<br>`;
   }
-  diceRollsArr = diceRollsArr.sort().reverse();
+  if (lowestScoreWins) {
+    diceRollsArr = diceRollsArr.sort();
+  } else {
+    diceRollsArr = diceRollsArr.sort().reverse();
+  }
   var finalNumber = Number(diceRollsArr.join(""));
-  //diceRollsForEachPlayerArr.push(finalNumber);
+
   // Keep score
   if (!playersRunningTotal[currPlayer]) {
     playersRunningTotal[currPlayer] = finalNumber;
@@ -49,16 +53,30 @@ var leaderBoard = (arr) => {
   for (var count = 0; count < arr.length; count += 1) {
     temp.push(playersRunningTotal[count]);
   }
-  for (var count = 0; count < arr.length; count += 1) {
-    var currMax = Math.max(...temp);
-    var playerWithCurrMax = temp.indexOf(currMax);
-    if (count == 0) {
-      var currLeader = playerWithCurrMax;
+  if (lowestScoreWins) {
+    for (var count = 0; count < arr.length; count += 1) {
+      var currMin = Math.min(...temp);
+      var playerWithCurrMin = temp.indexOf(currMin);
+      if (count == 0) {
+        var currLeader = playerWithCurrMin;
+      }
+      leaderBoardOutPut += `${count + 1}. Player ${
+        playerWithCurrMin + 1
+      }: ${currMin}<br>`;
+      temp[playerWithCurrMin] = Number.MAX_VALUE;
     }
-    leaderBoardOutPut += `${count + 1}. Player ${
-      playerWithCurrMax + 1
-    }: ${currMax}<br>`;
-    temp[playerWithCurrMax] = 0;
+  } else {
+    for (var count = 0; count < arr.length; count += 1) {
+      var currMax = Math.max(...temp);
+      var playerWithCurrMax = temp.indexOf(currMax);
+      if (count == 0) {
+        var currLeader = playerWithCurrMax;
+      }
+      leaderBoardOutPut += `${count + 1}. Player ${
+        playerWithCurrMax + 1
+      }: ${currMax}<br>`;
+      temp[playerWithCurrMax] = 0;
+    }
   }
   leaderBoardOutPut += `<br>The current leader is Player ${currLeader + 1}!`;
   return leaderBoardOutPut;
@@ -70,6 +88,7 @@ var currPlayer = 0;
 var numOfDice = 0;
 var diceRollsForEachPlayerArr = [];
 var playersRunningTotal = [];
+var lowestScoreWins = false;
 
 var main = function (input) {
   if (!playersRolledArr.length && !input) {
