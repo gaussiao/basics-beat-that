@@ -33,7 +33,7 @@ var rollDiceStr = (noOfDice) => {
   } else {
     playersRunningTotal[currPvpPlayer] += finalNumber;
   }
-  console.log(playersRunningTotal);
+
   msg += `<br>Your number is ${finalNumber}<br>`;
   msg += `${leaderBoard(playersRunningTotal)}`;
 
@@ -82,109 +82,10 @@ var leaderBoard = (arr) => {
   return leaderBoardOutPut;
 };
 
-// var knockOut = (numOfDice) => {
-//   var playersRemaining = [];
-//   for (
-//     var count = 0;
-//     count < numOfPlayers - playersKnockedOut.length;
-//     count += 1
-//   ) {
-//     if (!playersKnockedOut.includes(count)) {
-//       playersRemaining.push(count);
-//     }
-//   }
-//   console.log(`playersremaining ${playersRemaining}`);
-
-//   var count = 0;
-//   while (currPvPPlayers.length < 2) {
-//     var temp = rand(0, playersRemaining.length, false);
-//     if (!currPvPPlayers.includes(playersRemaining[temp])) {
-//       currPvPPlayers.push(playersRemaining[temp]);
-//       count += 1;
-//     }
-//     console.log(`currpvpplayers ${currPvPPlayers}`);
-//   }
-
-//   var currPlayer1 = currPvPPlayers[0];
-//   var currPlayer2 = currPvPPlayers[1];
-
-//   //currPlayer2 = rand(0, playersRemaining.length, false);
-//   console.log(`currp1, p2 ${currPlayer1}, ${currPlayer2}`);
-//   var knockOutMsg = `Player ${currPlayer1 + 1} will go against player ${
-//     currPlayer2 + 1
-//   }.<br>`;
-//   if (!knockOutPlayersScores[0]) {
-//     // if currPlayer1 hasn't rolled, he will roll
-//     var currPlayerRolls = knockOutRollDice(numOfDice);
-//     return knockOutMsg + currPlayerRolls;
-//   } else {
-//     var currPlayer2Score = knockOutRollDice(numOfDice);
-//     return knockOutMsg + currPlayer2Score;
-//   }
-// };
-
-// var knockOutRollDice = (numOfDice) => {
-//   var diceRollsArr = [];
-//   var currPlayer1 = currPvPPlayers[0];
-//   var currPlayer2 = currPvPPlayers[1];
-//   var msg = `Player ${
-//     knockOutPlayersScores[0] ? `${currPlayer1 + 1}` : `${currPlayer2 + 1}`
-//   }`;
-//   for (var count = 0; count < numOfDice; count += 1) {
-//     var currRoll = rand(1, 6, true);
-//     diceRollsArr.push(currRoll);
-//     msg += ` rolled ${currRoll} for dice ${count + 1}.<br>`;
-//   }
-//   if (lowestScoreWins) {
-//     diceRollsArr = diceRollsArr.sort();
-//   } else {
-//     diceRollsArr = diceRollsArr.sort().reverse();
-//   }
-
-//   var finalNumber = Number(diceRollsArr.join(""));
-//   if (!knockOutPlayersScores[0]) {
-//     knockOutPlayersScores[0] = finalNumber;
-//   } else {
-//     knockOutPlayersScores[1] = finalNumber;
-//   }
-//   msg += `Player ${
-//     knockOutPlayersScores[0] ? `${currPlayer2 + 1}` : `${currPlayer2 + 1}`
-//   } number is ${finalNumber}.`;
-//   console.log(knockOutPlayersScores);
-//   // WORK ON THIS PART: IF ONLY ONE PLAYER HAS ROLLED, GET THE OTHER PLAYER TO ROLL BEFORE DETERMINING THE WINNER!
-//   if (
-//     !lowestScoreWins &&
-//     knockOutPlayersScores[0] &&
-//     knockOutPlayersScores[1]
-//   ) {
-//     if (knockOutPlayersScores[0] > knockOutPlayersScores[1]) {
-//       msg += `<br>Player ${currPlayer1 + 1} wins! Player ${
-//         currPlayer2 + 1
-//       } is eliminated.`;
-//       playersKnockedOut.push(currPlayer2);
-//       knockOutPlayersScores = [];
-//       //console.log(`if ${knockOutPlayersScores}`);
-//     } else {
-//       msg += `<br>Player ${currPlayer2 + 1} wins! Player ${
-//         currPlayer1 + 1
-//       } is eliminated.`;
-//       playersKnockedOut.push(currPlayer1);
-//       knockOutPlayersScores = [];
-//       //console.log(`else ${knockOutPlayersScores}`);
-//     } //haven't done the elimination process!
-//   }
-
-//   currPvPPlayers = [];
-//   console.log(
-//     `playersknocked out ${playersKnockedOut}, currPvpplayers after game ${currPvPPlayers}`
-//   );
-//   return msg;
-// };
-// Knockout 2nd shot
+// Knockoutmode
 
 var pvpRollDice = (numOfDice) => {
   var rollResult = `Player ${currPvpPlayer + 1}:<br>`;
-  console.log(`currPvpPlayer ${currPvpPlayer}`);
 
   var rollArr = [];
   for (var count = 0; count < numOfDice; count += 1) {
@@ -274,8 +175,12 @@ var determineWinner = () => {
   if (pvpAllPlayers.length == 1) {
     grandWinnerMsg = `<br><br>The final winner has emerged! Congratulations, Player ${
       pvpAllPlayers[0] + 1
-    }!`;
+    }!<br><br>Clock Submit to play again.`;
     finalMsg += grandWinnerMsg;
+    // resetting the game once winner has been determined
+    numOfDice = 0;
+    pvpAllPlayers = [];
+    numOfPvPPlayers = 0;
   } else {
     var remainingPlayersMsg = `<br><br>Remaining players: ${pvpAllPlayersNonZeroIndexed.join(
       " "
@@ -286,6 +191,7 @@ var determineWinner = () => {
   currPvpPlayer = undefined;
   pvpSelectedPlayers = [];
   pvpSelectedPlayersScores = [];
+
   return finalMsg;
 };
 
@@ -332,6 +238,7 @@ var currPvpPlayer = undefined;
 
 // for testing purposes
 var main = function (input) {
+  // to fix later: after 1 complete round, after choosing number of players, when choosing dice, if input is blank, it's supposed to ask to select number of dice. Instead it asked to indicate number of players.
   if (!input && !numOfDice) {
     return `Please indicate number of players.`;
   } else if (input && !numOfPvPPlayers) {
@@ -339,7 +246,7 @@ var main = function (input) {
     for (var count = 0; count < numOfPvPPlayers; count += 1) {
       pvpAllPlayers.push(count);
     }
-    return `<br>Number of players is ${numOfPvPPlayers}. Now please choose the number of dice rolls.`;
+    return `Number of players is ${numOfPvPPlayers}. Now please choose the number of dice rolls.`;
   } else if (input && !numOfDice) {
     numOfDice = input;
     return `Rolling ${numOfDice} dice.`;
