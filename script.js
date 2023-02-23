@@ -272,13 +272,19 @@ var main = function (input) {
   }
 
   if (input) {
-    if (!numOfPlayers) {
+    if (!numOfPlayers && isNaN(input)) {
+      return `You did not input a number. Please input a number.`;
+    } else if (!numOfPlayers && !isNaN(input)) {
       numOfPlayers = input;
       playersRolledArr = initPlayersRolledArr(input);
       return `${numOfPlayers} players selected.<br>Please input the number of dice each player will roll.`;
-    } else if (!numOfDice) {
+    } else if (!numOfDice && isNaN(input)) {
+      return `You did not input a number. Please input a number.`;
+    } else if (!numOfDice && !isNaN(input)) {
       numOfDice = input;
       return `Using ${numOfDice} dice. Do you want the Highest or Lowest Score to win? Type 'highest' or 'lowest'.`;
+    } else if (lowestScoreWins == undefined && input != "h" && input != "l") {
+      return `You, like your previous choice, is invalid. Enter only 'h' or 'l'`;
     } else if (input == "h" || input == "l") {
       lowestScoreWins = input == "l";
       return `The ${input} score will win the round.<br>Finally, do you want to play this game in Knockout mode?Enter "y" for Knockout mode, or "n" for normal mode.`;
@@ -287,6 +293,8 @@ var main = function (input) {
       return `${
         knockOutMode ? `We are in Knockout Mode.` : `We are in Normal Mode,`
       } Click Submit to start the game!`;
+    } else if (input != "y" && input != "n") {
+      return `You just made an infinitely patient machine infinitely impatient with your inability to follow basic instructions.<br>Before your computer explodes, please enter only "y" or "n".`;
     }
   }
 
