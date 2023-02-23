@@ -28,12 +28,12 @@ var rollDiceStr = (noOfDice) => {
   var finalNumber = Number(diceRollsArr.join(""));
 
   // Keep score
-  if (!playersRunningTotal[currPvpPlayer]) {
-    playersRunningTotal[currPvpPlayer] = finalNumber;
+  if (!playersRunningTotal[currPlayer]) {
+    playersRunningTotal[currPlayer] = finalNumber;
   } else {
-    playersRunningTotal[currPvpPlayer] += finalNumber;
+    playersRunningTotal[currPlayer] += finalNumber;
   }
-
+  console.log(`after ${playersRunningTotal}`);
   msg += `<br>Your number is ${finalNumber}<br>`;
   msg += `${leaderBoard(playersRunningTotal)}`;
 
@@ -53,6 +53,7 @@ var leaderBoard = (arr) => {
   for (var count = 0; count < arr.length; count += 1) {
     temp.push(playersRunningTotal[count]);
   }
+
   if (lowestScoreWins) {
     for (var count = 0; count < arr.length; count += 1) {
       var currMin = Math.min(...temp);
@@ -69,9 +70,11 @@ var leaderBoard = (arr) => {
     for (var count = 0; count < arr.length; count += 1) {
       var currMax = Math.max(...temp);
       var playerWithCurrMax = temp.indexOf(currMax);
+
       if (count == 0) {
         var currLeader = playerWithCurrMax;
       }
+
       leaderBoardOutPut += `${count + 1}. Player ${
         playerWithCurrMax + 1
       }: ${currMax}<br>`;
@@ -82,7 +85,7 @@ var leaderBoard = (arr) => {
   return leaderBoardOutPut;
 };
 
-// Knockoutmode
+// Knockoutmode ------------------------------------
 
 var pvpRollDice = (numOfDice) => {
   var rollResult = `Player ${currPvpPlayer + 1}:<br>`;
@@ -158,7 +161,7 @@ var determineWinner = () => {
     }'s number is ${pvpSelectedPlayersScores[1]}.<br> `;
     var finalMsg = summaryOfEachPlayerRoll + winnerMsg + eliminatedMsg;
   }
-
+  console.log(`before repopulation ${pvpAllPlayers}`);
   // repopulating remaining players
   pvpAllPlayersAfterElimination = [];
   for (var count = 0; count < pvpAllPlayers.length; count += 1) {
@@ -166,6 +169,7 @@ var determineWinner = () => {
       pvpAllPlayersAfterElimination.push(pvpAllPlayers[count]);
     }
   }
+  console.log(`after repopulation ${pvpAllPlayers}`);
   pvpAllPlayers = pvpAllPlayersAfterElimination;
   var pvpAllPlayersNonZeroIndexed = [];
   for (var count = 0; count < pvpAllPlayers.length; count += 1) {
@@ -175,10 +179,11 @@ var determineWinner = () => {
   if (pvpAllPlayers.length == 1) {
     grandWinnerMsg = `<br><br>The final winner has emerged! Congratulations, Player ${
       pvpAllPlayers[0] + 1
-    }!<br><br>Clock Submit to play again.`;
+    }!<br><br>Click Submit to play again.`;
     finalMsg += grandWinnerMsg;
     // resetting the game once winner has been determined
     numOfDice = 0;
+    numOfPlayers = 0;
     pvpAllPlayers = [];
     numOfPvPPlayers = 0;
   } else {
@@ -195,100 +200,130 @@ var determineWinner = () => {
   return finalMsg;
 };
 
-var playKnockout = (pvpSelectedPlayers, numOfDice) => {
-  // Initialise all scores at 0
-  for (var count; count < pvpSelectedPlayers.length; count += 1) {
-    pvpSelectedPlayersScores.push(0);
-  }
-  return pvpRollDice(numOfDice);
-};
-var selectPlayers = (playersArr) => {
-  // selects 2 players to pvp. player can't play himself
-  // hardcode 2 for pvp pairs
-  while (pvpSelectedPlayers.length < 2) {
-    //
+var playKnockout = (numOfPlayers, numOfDice) => {
+  //helper function to select 2 players for pvp
+  var selectPlayers = (playersArr) => {
+    // selects 2 players to pvp. player can't play himself
+    // hardcode 2 for pvp pairs
+    while (pvpSelectedPlayers.length < 2) {
+      var temp = playersArr[rand(0, playersArr.length, false)];
 
-    var temp = playersArr[rand(0, playersArr.length, false)];
-
-    if (!pvpSelectedPlayers.includes(temp)) {
-      pvpSelectedPlayers.push(temp);
+      if (!pvpSelectedPlayers.includes(temp)) {
+        pvpSelectedPlayers.push(temp);
+      }
+    }
+    currPvpPlayer = pvpSelectedPlayers[0];
+    var msg = `Players ${pvpSelectedPlayers[0] + 1} and ${
+      pvpSelectedPlayers[1] + 1
+    } are selected to play.<br>`;
+    return msg;
+  };
+  if (!pvpAllPlayers.length) {
+    for (var count = 0; count < numOfPlayers; count += 1) {
+      pvpAllPlayers.push(count);
     }
   }
-
-  var msg = `Players ${pvpSelectedPlayers[0] + 1} and ${
-    pvpSelectedPlayers[1] + 1
-  } are selected to play.<br>`;
-  return msg;
+  console.log(`beginning ${pvpAllPlayers}`);
+  // Initialise all scores at 0
+  var selectedPlayersMsg = selectPlayers(pvpAllPlayers);
+  console.log(`pvpselectedplayers ${pvpSelectedPlayers}`);
+  for (var count; count < numOfPlayers; count += 1) {
+    pvpSelectedPlayersScores.push(0);
+  }
+  return selectedPlayersMsg + pvpRollDice(numOfDice);
 };
 
+// Initial configuration
 var numOfPlayers = 0;
+var numOfDice = 0;
+var lowestScoreWins = undefined;
+var knockOutMode = undefined;
+
+// score keeping, leaderboard
 var playersRolledArr = [];
 var currPlayer = 0;
-var numOfDice = 0;
 var diceRollsForEachPlayerArr = [];
 var playersRunningTotal = [];
-var lowestScoreWins = true;
 
-var knockOutMode = true;
 var numOfPvPPlayers = 0;
 var pvpAllPlayers = []; // grand total of all players
-var pvpSelectedPlayers = []; // selected players playing in a particular round
+var pvpSelectedPlayers = []; // selected 2 players playing in a particular round
 var pvpSelectedPlayersScores = [];
 var currPvpPlayer = undefined;
 
 // for testing purposes
-var main = function (input) {
-  // to fix later: after 1 complete round, after choosing number of players, when choosing dice, if input is blank, it's supposed to ask to select number of dice. Instead it asked to indicate number of players.
-  if (!input && !numOfDice) {
-    return `Please indicate number of players.`;
-  } else if (input && !numOfPvPPlayers) {
-    numOfPvPPlayers = input;
-    for (var count = 0; count < numOfPvPPlayers; count += 1) {
-      pvpAllPlayers.push(count);
-    }
-    return `Number of players is ${numOfPvPPlayers}. Now please choose the number of dice rolls.`;
-  } else if (input && !numOfDice) {
-    numOfDice = input;
-    return `Rolling ${numOfDice} dice.`;
-  }
-
-  if (!pvpSelectedPlayers.length) {
-    return selectPlayers(pvpAllPlayers);
-  }
-
-  if (currPvpPlayer == undefined) {
-    currPvpPlayer = pvpSelectedPlayers[0];
-  }
-
-  if (pvpSelectedPlayersScores.length == 2) {
-    return determineWinner();
-  }
-
-  return playKnockout(pvpSelectedPlayers, numOfDice);
-};
-
 // var main = function (input) {
-//   if (!playersRolledArr.length && !input) {
-//     return `Please select number of players.`;
-//   } else if (!playersRolledArr.length && input) {
-//     numOfPlayers = input;
-//     playersRolledArr = initPlayersRolledArr(input);
-//     return `${numOfPlayers} players selected.<br>Please input the number of dice each player will roll.`;
-//   } else if (playersRolledArr.length && !numOfDice && input) {
+//   // to fix later: after 1 complete round, after choosing number of players, when choosing dice, if input is blank, it's supposed to ask to select number of dice. Instead it asked to indicate number of players.
+//   if (!input && !numOfDice) {
+//     return `Please indicate number of players.`;
+//   } else if (input && !numOfPvPPlayers) {
+//     numOfPvPPlayers = input;
+//     for (var count = 0; count < numOfPvPPlayers; count += 1) {
+//       pvpAllPlayers.push(count);
+//     }
+//     return `Number of players is ${numOfPvPPlayers}. Now please choose the number of dice rolls.`;
+//   } else if (input && !numOfDice) {
 //     numOfDice = input;
-//     return `Using ${numOfDice} dice. Click Submit to roll!`;
-//   } else if (playersRolledArr.length && numOfDice && !knockOutMode && !input) {
-//     var rollMsg = rollDiceStr(numOfDice);
-//     rollMsg = `Player ${currPlayer + 1},<br>` + rollMsg;
-//     playersRolledArr[currPlayer] = true;
-//     currPlayer = (currPlayer + 1) % numOfPlayers;
-//     rollMsg += `<br>Player ${
-//       (currPlayer % numOfPlayers) + 1
-//     }, click Submit to roll.`;
-
-//     return rollMsg;
-//   } else if (playersRolledArr.length && numOfDice && knockOutMode && !input) {
-//     console.log(`playerscores ${knockOutPlayersScores}`);
-//     return knockOut(numOfDice);
+//     return `Rolling ${numOfDice} dice.`;
 //   }
+
+//   if (!pvpSelectedPlayers.length) {
+//     return selectPlayers(pvpAllPlayers);
+//   }
+
+//   if (currPvpPlayer == undefined) {
+//     currPvpPlayer = pvpSelectedPlayers[0];
+//   }
+
+//   if (pvpSelectedPlayersScores.length == 2) {
+//     return determineWinner();
+//   }
+
+//   return playKnockout(pvpSelectedPlayers, numOfDice);
 // };
+
+var main = function (input) {
+  if (!input) {
+    if (!numOfPlayers) {
+      return `Please select number of players.`;
+    } else if (!numOfDice) {
+      return `Please input the number of dice.`;
+    } else if (lowestScoreWins == undefined) {
+      return `Do you want the Highest or Lowest Score to win? Type 'highest' or 'lowest'.`;
+    }
+  }
+
+  if (input) {
+    if (!numOfPlayers) {
+      numOfPlayers = input;
+      playersRolledArr = initPlayersRolledArr(input);
+      return `${numOfPlayers} players selected.<br>Please input the number of dice each player will roll.`;
+    } else if (!numOfDice) {
+      numOfDice = input;
+      return `Using ${numOfDice} dice. Do you want the Highest or Lowest Score to win? Type 'highest' or 'lowest'.`;
+    } else if (input == "h" || input == "l") {
+      lowestScoreWins = input == "l";
+      return `The ${input} score will win the round.<br>Finally, do you want to play this game in Knockout mode?Enter "y" for Knockout mode, or "n" for normal mode.`;
+    } else if (input == "y" || input == "n") {
+      knockOutMode = input == "y";
+      return `${
+        knockOutMode ? `We are in Knockout Mode.` : `We are in Normal Mode,`
+      } Click Submit to start the game!`;
+    }
+  }
+
+  // TBC
+  else if (playersRolledArr.length && numOfDice && !knockOutMode && !input) {
+    var rollMsg = rollDiceStr(numOfDice);
+    rollMsg = `Player ${currPlayer + 1},<br>` + rollMsg;
+    playersRolledArr[currPlayer] = true;
+    currPlayer = (currPlayer + 1) % numOfPlayers;
+    rollMsg += `<br>Player ${
+      (currPlayer % numOfPlayers) + 1
+    }, click Submit to roll.`;
+
+    return rollMsg;
+  } else if (playersRolledArr.length && numOfDice && knockOutMode && !input) {
+    return playKnockout(numOfPlayers, numOfDice);
+  }
+};
