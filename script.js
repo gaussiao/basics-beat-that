@@ -162,7 +162,7 @@ var determineWinner = () => {
       pvpSelectedPlayers[1] + 1
     } scored ${
       pvpSelectedPlayersScores[0]
-    }! It's a draw. Click Submit to roll again.`;
+    }! It's a draw. Click Beat it!🦯 to roll again.`;
     pvpSelectedPlayersScores = [];
     return drawMsg;
   }
@@ -219,9 +219,9 @@ var determineWinner = () => {
   }
   var grandWinnerMsg = "";
   if (pvpAllPlayers.length == 1) {
-    grandWinnerMsg = `<br><br>The final winner has emerged! Congratulations, Player ${
+    grandWinnerMsg = `<br><br>We have found our ultimate Beater! Congratulations, Player ${
       pvpAllPlayers[0] + 1
-    }!<br><br>Click Submit to play again.`;
+    }! <br><br>Click Beat it!🦯 to play again.`;
     finalMsg += grandWinnerMsg;
     // resetting the game once winner has been determined
     numOfDice = 0;
@@ -282,31 +282,30 @@ var main = function (input) {
       return `You did not input a number. Please input a number.`;
     } else if (!numOfDice && !isNaN(input)) {
       numOfDice = input;
-      return `Using ${numOfDice} dice. Do you want the Highest or Lowest Score to win? Type 'highest' or 'lowest'.`;
+      return `Using ${numOfDice} dice. Do you want the Highest or Lowest Score to win? Type 'h' or 'l'.`;
     } else if (lowestScoreWins == undefined && input != "h" && input != "l") {
-      return `You, like your previous choice, is invalid. Enter only 'h' or 'l'`;
+      return `You, like your previous choice, are invalid. Enter only 'h' or 'l'`;
     } else if (input == "h" || input == "l") {
       lowestScoreWins = input == "l";
-      return `The ${input} score will win the round.<br>Finally, do you want to play this game in Knockout mode?Enter "y" for Knockout mode, or "n" for normal mode.`;
+      return `The ${
+        lowestScoreWins ? `Lowest` : `Highest`
+      } score will win the round.<br>Finally, do you want to play this game in Knockout mode?Enter "y" for Knockout mode, or "n" for normal mode.`;
     } else if (input == "y" || input == "n") {
       knockOutMode = input == "y";
       return `${
-        knockOutMode ? `We are in Knockout Mode.` : `We are in Normal Mode,`
-      } Click Submit to start the game!`;
+        knockOutMode ? `We are in Knockout Mode.` : `We are in Normal Mode.`
+      } Click Beat it!🦯 to start the game!`;
     } else if (input != "y" && input != "n") {
-      return `You just made an infinitely patient machine infinitely impatient with your inability to follow basic instructions.<br>Before your computer explodes, please enter only "y" or "n".`;
+      return `You just made an infinitely patient machine infinitely frustrated with your inability to follow basic instructions.<br>Before your computer explodes, please enter only "y" or "n".`;
     }
-  }
-
-  // TBC
-  else if (playersRolledArr.length && numOfDice && !knockOutMode && !input) {
+  } else if (playersRolledArr.length && numOfDice && !knockOutMode && !input) {
     var rollMsg = rollDiceStr(numOfDice);
     rollMsg = `Player ${currPlayer + 1},<br>` + rollMsg;
     playersRolledArr[currPlayer] = true;
     currPlayer = (currPlayer + 1) % numOfPlayers;
     rollMsg += `<br>Player ${
       (currPlayer % numOfPlayers) + 1
-    }, click Submit to roll.`;
+    }, click Beat it!🦯 to roll.`;
 
     return rollMsg;
   } else if (playersRolledArr.length && numOfDice && knockOutMode && !input) {
