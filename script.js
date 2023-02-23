@@ -33,7 +33,7 @@ var rollDiceStr = (noOfDice) => {
   } else {
     playersRunningTotal[currPlayer] += finalNumber;
   }
-  console.log(`after ${playersRunningTotal}`);
+
   msg += `<br>Your number is ${finalNumber}<br>`;
   msg += `${leaderBoard(playersRunningTotal)}`;
 
@@ -87,12 +87,46 @@ var leaderBoard = (arr) => {
 
 // Knockoutmode ------------------------------------
 
+var playKnockout = (numOfPlayers, numOfDice) => {
+  //helper function to select 2 players for pvp
+  var selectPlayers = (playersArr) => {
+    // selects 2 players to pvp. player can't play himself
+    // hardcode 2 for pvp pairs
+    while (pvpSelectedPlayers.length < 2) {
+      var temp = playersArr[rand(0, playersArr.length, false)];
+
+      if (!pvpSelectedPlayers.includes(temp)) {
+        pvpSelectedPlayers.push(temp);
+      }
+    }
+    currPvpPlayer = pvpSelectedPlayers[0];
+    var msg = `Players ${pvpSelectedPlayers[0] + 1} and ${
+      pvpSelectedPlayers[1] + 1
+    } are selected to play.<br>`;
+    return msg;
+  };
+  if (!pvpAllPlayers.length) {
+    for (var count = 0; count < numOfPlayers; count += 1) {
+      pvpAllPlayers.push(count);
+    }
+  }
+
+  // Initialise all scores at 0
+  var selectedPlayersMsg = selectPlayers(pvpAllPlayers);
+
+  for (var count; count < numOfPlayers; count += 1) {
+    pvpSelectedPlayersScores.push(0);
+  }
+  return selectedPlayersMsg + pvpRollDice(numOfDice);
+};
+
 var pvpRollDice = (numOfDice) => {
   var rollResult = `Player ${currPvpPlayer + 1}:<br>`;
 
   var rollArr = [];
   for (var count = 0; count < numOfDice; count += 1) {
     var currRoll = rand(1, 6, true);
+
     rollArr.push(currRoll);
     rollResult += `You rolled ${currRoll} for Dice ${count + 1}<br>`;
   }
@@ -123,7 +157,15 @@ var pvpRollDice = (numOfDice) => {
 
 var determineWinner = () => {
   // Simplify eliminate so that it fits only 2 players
-
+  if (pvpSelectedPlayersScores[0] == pvpSelectedPlayersScores[1]) {
+    var drawMsg = `Both Player ${pvpSelectedPlayers[0] + 1} & Player ${
+      pvpSelectedPlayers[1] + 1
+    } scored ${
+      pvpSelectedPlayersScores[0]
+    }! It's a draw. Click Submit to roll again.`;
+    pvpSelectedPlayersScores = [];
+    return drawMsg;
+  }
   if (lowestScoreWins) {
     var winner =
       pvpSelectedPlayers[
@@ -161,7 +203,7 @@ var determineWinner = () => {
     }'s number is ${pvpSelectedPlayersScores[1]}.<br> `;
     var finalMsg = summaryOfEachPlayerRoll + winnerMsg + eliminatedMsg;
   }
-  console.log(`before repopulation ${pvpAllPlayers}`);
+
   // repopulating remaining players
   pvpAllPlayersAfterElimination = [];
   for (var count = 0; count < pvpAllPlayers.length; count += 1) {
@@ -169,7 +211,7 @@ var determineWinner = () => {
       pvpAllPlayersAfterElimination.push(pvpAllPlayers[count]);
     }
   }
-  console.log(`after repopulation ${pvpAllPlayers}`);
+
   pvpAllPlayers = pvpAllPlayersAfterElimination;
   var pvpAllPlayersNonZeroIndexed = [];
   for (var count = 0; count < pvpAllPlayers.length; count += 1) {
@@ -200,39 +242,6 @@ var determineWinner = () => {
   return finalMsg;
 };
 
-var playKnockout = (numOfPlayers, numOfDice) => {
-  //helper function to select 2 players for pvp
-  var selectPlayers = (playersArr) => {
-    // selects 2 players to pvp. player can't play himself
-    // hardcode 2 for pvp pairs
-    while (pvpSelectedPlayers.length < 2) {
-      var temp = playersArr[rand(0, playersArr.length, false)];
-
-      if (!pvpSelectedPlayers.includes(temp)) {
-        pvpSelectedPlayers.push(temp);
-      }
-    }
-    currPvpPlayer = pvpSelectedPlayers[0];
-    var msg = `Players ${pvpSelectedPlayers[0] + 1} and ${
-      pvpSelectedPlayers[1] + 1
-    } are selected to play.<br>`;
-    return msg;
-  };
-  if (!pvpAllPlayers.length) {
-    for (var count = 0; count < numOfPlayers; count += 1) {
-      pvpAllPlayers.push(count);
-    }
-  }
-  console.log(`beginning ${pvpAllPlayers}`);
-  // Initialise all scores at 0
-  var selectedPlayersMsg = selectPlayers(pvpAllPlayers);
-  console.log(`pvpselectedplayers ${pvpSelectedPlayers}`);
-  for (var count; count < numOfPlayers; count += 1) {
-    pvpSelectedPlayersScores.push(0);
-  }
-  return selectedPlayersMsg + pvpRollDice(numOfDice);
-};
-
 // Initial configuration
 var numOfPlayers = 0;
 var numOfDice = 0;
@@ -250,37 +259,6 @@ var pvpAllPlayers = []; // grand total of all players
 var pvpSelectedPlayers = []; // selected 2 players playing in a particular round
 var pvpSelectedPlayersScores = [];
 var currPvpPlayer = undefined;
-
-// for testing purposes
-// var main = function (input) {
-//   // to fix later: after 1 complete round, after choosing number of players, when choosing dice, if input is blank, it's supposed to ask to select number of dice. Instead it asked to indicate number of players.
-//   if (!input && !numOfDice) {
-//     return `Please indicate number of players.`;
-//   } else if (input && !numOfPvPPlayers) {
-//     numOfPvPPlayers = input;
-//     for (var count = 0; count < numOfPvPPlayers; count += 1) {
-//       pvpAllPlayers.push(count);
-//     }
-//     return `Number of players is ${numOfPvPPlayers}. Now please choose the number of dice rolls.`;
-//   } else if (input && !numOfDice) {
-//     numOfDice = input;
-//     return `Rolling ${numOfDice} dice.`;
-//   }
-
-//   if (!pvpSelectedPlayers.length) {
-//     return selectPlayers(pvpAllPlayers);
-//   }
-
-//   if (currPvpPlayer == undefined) {
-//     currPvpPlayer = pvpSelectedPlayers[0];
-//   }
-
-//   if (pvpSelectedPlayersScores.length == 2) {
-//     return determineWinner();
-//   }
-
-//   return playKnockout(pvpSelectedPlayers, numOfDice);
-// };
 
 var main = function (input) {
   if (!input) {
