@@ -8,7 +8,8 @@
       }
 
       body {
-        font-family: sans-serif;
+        font-family: fantasy;
+        font-size: 20px;
         margin-left: 30px;
         margin-right: 30px;
       }
@@ -18,7 +19,7 @@
       }
 
       #container {
-        background-color: pink;
+        background-color: rgb(25, 17, 80);
         margin: 40px auto;
         max-width: 800px;
         padding: 38px 31px;
@@ -34,6 +35,7 @@
 
       button {
         font-size: 21px;
+        font-family: fantasy;
         line-height: 33px;
         margin: 0 0 23px 0;
         padding: 0 6px;
@@ -45,16 +47,45 @@
         padding: 20px;
         width: 100%;
       }
+      label input {
+        font-family: fantasy;
+        font-size: 1rem;
+        font-weight: bold;
+
+        line-height: 1.1;
+        align-items: baseline;
+        position: "top";
+      }
+      p {
+        color: white;
+      }
     </style>
   </head>
 
   <body>
     <h1 id="header">Basics: Beat That! 🚀</h1>
+
     <div id="container">
+      <p>Greetings, aspiring Beaters(and Beatees)!</p>
+      <p>
+        This game allows you to manifest your violent tendencies in a safe way.
+      </p>
+      <p>
+        Roll a predetermined number of dice, and digital elves will do your
+        bidding, and arrange them to form either the Highest or Lowest possible
+        number, depending on the mode of your choice. You can see the current
+        Beaters and Beatees on the Beaterboard.
+      </p>
+      <p>
+        If you desire a more personal beating, 1v1 is available in Knockout
+        Mode.
+      </p>
+      <p>To proceed with the beating(or getting beaten), click Beat it!🦯</p>
+
       <p>Input:</p>
       <input id="input-field" />
       <br />
-      <button id="submit-button">Submit</button>
+      <button id="submit-button">Beat it!🦯</button>
       <p>Output:</p>
       <div id="output-div"></div>
     </div>
